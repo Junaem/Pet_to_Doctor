@@ -9,7 +9,7 @@ import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 const pc_config = {
     iceServer: [{ urls: "stun:stun.l.google.com:19302" }],
 };
-const SOCKET_SERVER_URL = "http://192.168.35.26:9000";
+const SOCKET_SERVER_URL = "3.34.138.92:9000";
 
 function UserConsulting(props) {
     const navigate = useNavigate();

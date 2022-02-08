@@ -15,7 +15,7 @@ const newTheme = createTheme({
 function UserLoginModal(props) {
     console.log(props);
     const REST_API_KEY = "c9d9cd706215602e662da44e2c2150a2";
-    const REDIRECT_URI = "http://localhost:3000/kakaooauth";
+    const REDIRECT_URI = "3.34.138.92:3000/kakaooauth";
     const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     async function userLogin() {
         // test5555 , 123
