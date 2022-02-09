@@ -9,7 +9,7 @@ import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 const pc_config = {
     iceServer: [{ urls: "stun:stun.l.google.com:19302" }],
 };
-const SOCKET_SERVER_URL = "http://192.168.35.26:9000";
+const SOCKET_SERVER_URL = "https://i6b209.p.ssafy.io:443/";
 
 function UserConsulting(props) {
     const navigate = useNavigate();
@@ -50,9 +50,9 @@ function UserConsulting(props) {
                         .forEach((track) => (track.onended = () => console.log("상대방비디오종료")));
                 }
             };
-            socketRef.current.emit("join_room", {
-                room: "1234",
-            });
+            // socketRef.current.emit("join_room", {
+            //     room: "1234",
+            // });
             console.dir(localVideoRef.current.srcObject.getVideoTracks());
             console.dir(localVideoRef.current.srcObject.getAudioTracks());
         } catch (e) {
@@ -67,7 +67,7 @@ function UserConsulting(props) {
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true,
             });
-            await pcRef.current.setLocalDescription(new RTCSessionDescription(sdp));
+            await pcRef.current.setLocalDescription(sdp);
             socketRef.current.emit("offer", sdp);
         } catch (e) {
             console.error(e);
@@ -76,20 +76,21 @@ function UserConsulting(props) {
     const createAnswer = async (sdp) => {
         if (!(pcRef.current && socketRef.current)) return;
         try {
-            await pcRef.current.setRemoteDescription(new RTCSessionDescription(sdp));
+            await pcRef.current.setRemoteDescription(sdp);
             console.log("answer set remote description success");
             const mySdp = await pcRef.current.createAnswer({
                 offerToReceiveVideo: true,
                 offerToReceiveAudio: true,
             });
             console.log("create answer");
-            await pcRef.current.setLocalDescription(new RTCSessionDescription(mySdp));
+            await pcRef.current.setLocalDescription(mySdp);
             socketRef.current.emit("answer", mySdp);
         } catch (e) {
             console.error(e);
         }
     };
-    useEffect(() => {
+    useEffect(async () => {
+        await setVideoTracks();
         socketRef.current = io.connect(SOCKET_SERVER_URL);
         pcRef.current = new RTCPeerConnection(pc_config);
 
@@ -106,7 +107,7 @@ function UserConsulting(props) {
         socketRef.current.on("getAnswer", (sdp) => {
             console.log("get answer");
             if (!pcRef.current) return;
-            pcRef.current.setRemoteDescription(new RTCSessionDescription(sdp));
+            pcRef.current.setRemoteDescription(sdp);
             console.log(sdp);
         });
         socketRef.current.on("getCandidate", async (candidate) => {
@@ -118,7 +119,12 @@ function UserConsulting(props) {
         socketRef.current.on("otherVideoOff", () => {
             console.log("전송받음");
         });
-        setVideoTracks();
+        // setVideoTracks();
+
+        socketRef.current.emit("join_room", {
+            room: "1234",
+        });
+
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();

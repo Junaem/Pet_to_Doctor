@@ -1,22 +1,33 @@
 let express = require("express");
-let http = require("http");
+let https = require("https");
 let app = express();
 let cors = require("cors");
-let server = http.createServer(app);
+
+const fs = require('fs');
+const options = {
+    ca: fs.readFileSync('./fullchain.pem'),
+    key: fs.readFileSync('./privkey.pem'),
+    cert: fs.readFileSync('./cert.pem')
+};
+
+
+let server = https.createServer(options, app);
 let socketio = require("socket.io");
 let io = socketio.listen(server);
 
+
 app.use(cors());
-const PORT = process.env.PORT || 9000;
-const hostname = "192.168.35.26"; 
+const PORT = process.env.PORT || 443;
+const hostname = "0.0.0.0"; 
 let users = {};
 
 let socketToRoom = {};
 
-const maximum = process.env.MAXIMUM || 2;
+const maximum = process.env.MAXIMUM || 4;
 
 io.on("connection", (socket) => {
     socket.on("join_room", (data) => {
+        console.log("ddddddddddddddddddddd")
         if (users[data.room]) {
             const length = users[data.room].length;
             if (length === maximum) {
